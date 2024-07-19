@@ -9,6 +9,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class UsuarioService implements UserDetailsService {
 
@@ -39,6 +42,12 @@ public class UsuarioService implements UserDetailsService {
         return usuario;
     }
 
+    /**
+     * @param email
+     * @return Esto está retornando el usuario obteniendo como parámetro principal el
+     * Correo electrónico
+     * @throws UsernameNotFoundException
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Usuario usuario = usuarioRepository.findByEmail(email)
@@ -47,5 +56,19 @@ public class UsuarioService implements UserDetailsService {
                 .password(usuario.getPassword())
                 .authorities("USER")
                 .build();
+    }
+
+    public void updatePassword(Long id, String newPassword) {
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        usuario.setPassword(newPassword);
+        usuarioRepository.save(usuario);
+    }
+
+    public void deleteUsuario(Long id) {
+        usuarioRepository.deleteById(id);
+    }
+
+    public List<Usuario> getAllUsuarios() {
+        return new ArrayList<>(usuarioRepository.findAll());
     }
 }
